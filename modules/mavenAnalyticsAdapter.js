@@ -55,6 +55,7 @@ let mavenAnalytics = Object.assign(adapter({hummingbirdUrl, analyticsType}), {
                     }
                     auctionObj = {
                         auctionId: id,
+                        browserType: options.browserType,
                         connectionEffectiveType: connType,
                         contentItemId: options.contentItemId,
                         correlator: window.hummingbirdCorrelator,
@@ -199,11 +200,38 @@ mavenAnalytics.enableAnalytics = function (config) {
         return;
     }
     options = config.options;
+    options.browserType = this.generateBrowserType();
     mavenAnalytics.originEnableAnalytics(config); // call the base class function
     initialized = true;
     hummingbirdUrl = options.url; 
     verbose = !!options.verbose;
 };
+
+mavenAnalytics.generateBrowserType = function() {
+    // Browser sniffing -- this gets us all browser families with >1% of
+    // traffic, according to the 2019 Wikimedia report.
+    let ua = navigator.userAgent;
+    if (ua.includes('Chrome/')) {
+        if (ua.includes('Edg/') || ua.includes('Edge')) {
+            return 'edge';
+        } else if (ua.includes('SamsungBrowser')) {
+            return 'samsung';
+        } else if (!ua.includes('Chromium/')) {
+            return 'chrome';
+        }
+    } else if (ua.includes('Safari/')) {
+        return 'safari';
+    } else if (ua.includes('Firefox/')) {
+        if (!ua.includes('Seamonkey/')) {
+            return 'firefox';
+        }
+    } else if (ua.includes('Trident/') || ua.includes('MSIE')) {
+        return 'ie';
+    } else if (ua.includes('OPR/') || ua.includes('Opera/')) {
+        return 'opera';
+    }
+    return 'other';
+}
 
 adaptermanager.registerAnalyticsAdapter({
     adapter: mavenAnalytics,
