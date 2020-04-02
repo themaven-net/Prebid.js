@@ -217,7 +217,9 @@ mavenAnalytics.generateBrowserType = function() {
     // We can't use String.prototype.includes to allow support of IE.
     let ua = navigator.userAgent;
     if (ua.indexOf('Chrome/') >= 0) {
-        if (ua.indexOf('Edg/') >= 0 || ua.indexOf('Edge') >= 0) {
+        if (ua.indexOf('OPR/') >= 0) {
+            return 'opera';
+        } else if (ua.indexOf('Edg/') >= 0 || ua.indexOf('Edge') >= 0) {
             return 'edge';
         } else if (ua.indexOf('SamsungBrowser') >= 0) {
             return 'samsung';
