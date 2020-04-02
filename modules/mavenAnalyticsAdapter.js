@@ -209,7 +209,10 @@ mavenAnalytics.enableAnalytics = function (config) {
 
 mavenAnalytics.generateBrowserType = function() {
     // Browser sniffing -- this gets us all browser families with >1% of
-    // traffic, according to the 2019 Wikimedia report.
+    // traffic, according to the 2019 Wikimedia report. This set of tests
+    // is largely based on
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Browser_detection_using_the_user_agent
+    // and should be relatively resilient to changes in user-agent behavior.
     //
     // We can't use String.prototype.includes to allow support of IE.
     let ua = navigator.userAgent;
