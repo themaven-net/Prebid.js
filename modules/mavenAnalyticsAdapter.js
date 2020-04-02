@@ -210,24 +210,27 @@ mavenAnalytics.enableAnalytics = function (config) {
 mavenAnalytics.generateBrowserType = function() {
     // Browser sniffing -- this gets us all browser families with >1% of
     // traffic, according to the 2019 Wikimedia report.
+    //
+    // We can't use String.prototype.includes to allow support of IE.
     let ua = navigator.userAgent;
-    if (ua.includes('Chrome/')) {
-        if (ua.includes('Edg/') || ua.includes('Edge')) {
+    if (ua.indexOf('Chrome/') >= 0) {
+        if (ua.indexOf('Edg/') >= 0 || ua.indexOf('Edge') >= 0) {
             return 'edge';
-        } else if (ua.includes('SamsungBrowser')) {
+        } else if (ua.indexOf('SamsungBrowser') >= 0) {
             return 'samsung';
-        } else if (!ua.includes('Chromium/')) {
+        } else if (ua.indexOf('Chromium/') == -1) {
+            // Chromium could be Chromium, Brave, etc.
             return 'chrome';
         }
-    } else if (ua.includes('Safari/')) {
+    } else if (ua.indexOf('Safari/') >= 0) {
         return 'safari';
-    } else if (ua.includes('Firefox/')) {
-        if (!ua.includes('Seamonkey/')) {
+    } else if (ua.indexOf('Firefox/') >= 0) {
+        if (ua.indexOf('Seamonkey/') == -1) {
             return 'firefox';
         }
-    } else if (ua.includes('Trident/') || ua.includes('MSIE')) {
+    } else if (ua.indexOf('Trident/') >= 0 || ua.indexOf('MSIE') >= 0) {
         return 'ie';
-    } else if (ua.includes('OPR/') || ua.includes('Opera/')) {
+    } else if (ua.indexOf('OPR/') >= 0 || ua.indexOf('Opera/') >= 0) {
         return 'opera';
     }
     return 'other';
