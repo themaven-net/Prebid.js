@@ -1,7 +1,7 @@
-import { spec } from 'modules/ajaBidAdapter';
-import { newBidder } from 'src/adapters/bidderFactory';
+import { spec } from 'modules/ajaBidAdapter.js';
+import { newBidder } from 'src/adapters/bidderFactory.js';
 
-const ENDPOINT = '//ad.as.amanad.adtdp.com/v2/prebid';
+const ENDPOINT = 'https://ad.as.amanad.adtdp.com/v2/prebid';
 
 describe('AjaAdapter', function () {
   const adapter = newBidder(spec);
@@ -50,7 +50,7 @@ describe('AjaAdapter', function () {
 
     let bidderRequest = {
       refererInfo: {
-        referer: 'http://hoge.com'
+        referer: 'https://hoge.com'
       }
     };
 
@@ -58,7 +58,7 @@ describe('AjaAdapter', function () {
       const requests = spec.buildRequests(bidRequests, bidderRequest);
       expect(requests[0].url).to.equal(ENDPOINT);
       expect(requests[0].method).to.equal('GET');
-      expect(requests[0].data).to.equal('asi=123456&skt=5&prebid_id=30b31c1838de1e&prebid_ver=$prebid.version$&page_url=http%3A%2F%2Fhoge.com&');
+      expect(requests[0].data).to.equal('asi=123456&skt=5&prebid_id=30b31c1838de1e&prebid_ver=$prebid.version$&page_url=https%3A%2F%2Fhoge.com&');
     });
   });
 
@@ -77,9 +77,12 @@ describe('AjaAdapter', function () {
             'h': 250,
             'tag': '<div></div>',
             'imps': [
-              '//as.amanad.adtdp.com/v1/imp'
+              'https://as.amanad.adtdp.com/v1/imp'
+            ],
+            'adomain': [
+              'www.example.com'
             ]
-          }
+          },
         },
         'syncs': [
           'https://example.com'
@@ -98,7 +101,12 @@ describe('AjaAdapter', function () {
           'mediaType': 'banner',
           'currency': 'USD',
           'ttl': 300,
-          'netRevenue': true
+          'netRevenue': true,
+          'meta': {
+            'advertiserDomains': [
+              'www.example.com'
+            ]
+          }
         }
       ];
 
@@ -120,10 +128,13 @@ describe('AjaAdapter', function () {
             'w': 300,
             'h': 250,
             'vtag': '<VAST></VAST>',
-            'purl': 'http://cdn/player',
+            'purl': 'https://cdn/player',
             'progress': true,
             'loop': false,
-            'inread': false
+            'inread': false,
+            'adomain': [
+              'www.example.com'
+            ]
           }
         },
         'syncs': [
@@ -178,7 +189,10 @@ describe('AjaAdapter', function () {
                     'https://example.com/inview'
                   ],
                   'jstracker': '',
-                  'disable_trimming': false
+                  'disable_trimming': false,
+                  'adomain': [
+                    'www.example.com'
+                  ]
                 }
               ]
             }
@@ -218,7 +232,12 @@ describe('AjaAdapter', function () {
             'impressionTrackers': [
               'https://example.com/imp'
             ],
-            'privacyLink': 'https://aja-kk.co.jp/optout',
+            'privacyLink': 'https://aja-kk.co.jp/optout'
+          },
+          'meta': {
+            'advertiserDomains': [
+              'www.example.com'
+            ]
           }
         }
       ];

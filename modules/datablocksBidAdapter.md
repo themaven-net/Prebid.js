@@ -8,8 +8,8 @@ Maintainer: support@datablocks.net
 
 # Description
 
-Connects to Datablocks Version 5 Platform
-Banner Native and 
+Connects to Datablocks Exchange
+Banner and Native
 
 
 # Test Parameters
@@ -27,12 +27,13 @@ Banner Native and
           {
             bidder: 'datablocks',
             params: {
-              sourceId: 12345,
+              source_id: 12345,
               host: 'prebid.datablocks.net'
             }
           }
         ]
-      }, {
+      },
+      {
         code: 'native-div',
         mediaTypes : {
           native: {
@@ -44,7 +45,7 @@ Banner Native and
           {
             bidder: 'datablocks',
             params: {
-              sourceId: 12345,
+              source_id: 12345,
               host: 'prebid.datablocks.net'
             }
           }
