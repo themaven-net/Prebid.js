@@ -287,19 +287,6 @@ export function logError() {
   emitEvent(CONSTANTS.EVENTS.AUCTION_DEBUG, {type: 'ERROR', arguments: arguments});
 }
 
-let getTimestamp
-if (window.performance && window.performance.now) {
-  getTimestamp = function getTimestamp() {
-    // truncate any partial millisecond
-    return window.performance.now() | 0
-  }
-} else {
-  const initTime = +new Date()
-  getTimestamp = function getTimestamp() {
-    return new Date() - initTime
-  }
-}
-
 export function prefixLog(prefix) {
   function decorate(fn) {
     return function (...args) {
@@ -319,7 +306,7 @@ function decorateLog(args, prefix) {
   let bidder = config.getCurrentBidder();
 
   prefix && args.unshift(prefix);
-  args.unshift(getTimestamp())
+  args.unshift(getPerformanceNow());
   if (bidder) {
     args.unshift(label('#aaa'));
   }

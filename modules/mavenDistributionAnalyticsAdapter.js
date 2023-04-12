@@ -9,6 +9,7 @@ import { logError, logInfo, logWarn } from '../src/utils.js';
 // Standard Analytics Adapter code
 const AUCTION_END = CONSTANTS.EVENTS.AUCTION_END
 const AUCTION_INIT = CONSTANTS.EVENTS.AUCTION_INIT
+const AUCTION_DEBUG = CONSTANTS.EVENTS.AUCTION_DEBUG
 
 // Internal controls
 const BATCH_MESSAGE_FREQUENCY = 1000; // Send results batched on a 1s delay
@@ -63,7 +64,7 @@ const MAX_BATCH_SIZE_PER_EVENT_TYPE = 32
  * @param {MavenDistributionAdapterConfig} adapterConfig
  * @return {AuctionEndSummary}
  */
-export function summarizeAuctionInit(args, adapterConfig) {
+export function summarizeAuctionInit(args, elapsedTime, adapterConfig) {
   const zoneNames = []
   const zoneIndexes = []
   const adUnitCodes = []
@@ -90,7 +91,7 @@ export function summarizeAuctionInit(args, adapterConfig) {
   const eventToSend = {
     auc: args.auctionId,
     ts: args.timestamp,
-    tspl: args.timestamp - (Date.now() - (window.performance.now() | 0)),
+    tspl: elapsedTime || (args.timestamp - (Date.now() - (window.performance.now() | 0))),
     tspl_q: window.performance.now() | 0,
   }
   if (!allZoneNamesNonNull) eventToSend.codes = adUnitCodes
@@ -115,7 +116,7 @@ export function summarizeAuctionInit(args, adapterConfig) {
  * @param {MavenDistributionAdapterConfig} adapterConfig
  * @return {AuctionEndSummary}
  */
-export function summarizeAuctionEnd(args, adapterConfig) {
+export function summarizeAuctionEnd(args, elapsedTime, adapterConfig) {
   /** @type {{[code: string]: number}} */
   const cpmmsMap = {}
   /** @type {AuctionEndSummary} */
@@ -131,7 +132,7 @@ export function summarizeAuctionEnd(args, adapterConfig) {
   // args.timestamp is only the _auctionStart in src/auction.js
   // so to get the time for this event we want args.auctionEnd
   eventToSend.ts = args.auctionEnd
-  eventToSend.tspl = args.auctionEnd - (Date.now() - (window.performance.now() | 0))
+  eventToSend.tspl = elapsedTime || (args.auctionEnd - (Date.now() - (window.performance.now() | 0)))
   eventToSend.tspl_q = window.performance.now() | 0
   return eventToSend
 }
@@ -228,12 +229,14 @@ MavenDistributionAnalyticsAdapterInner.prototype = {
    * @param {{eventType: string, args: any}} typeAndArgs
    */
   track(typeAndArgs) {
-    const {eventType, args} = typeAndArgs
+    const {eventType, args, elapsedTime } = typeAndArgs
     let eventToSend
     if (eventType === AUCTION_INIT) {
-      eventToSend = summarizeAuctionInit(args, this.adapterConfig)
+      eventToSend = summarizeAuctionInit(args, elapsedTime, this.adapterConfig)
     } else if (eventType === AUCTION_END) {
-      eventToSend = summarizeAuctionEnd(args, this.adapterConfig)
+      eventToSend = summarizeAuctionEnd(args, elapsedTime, this.adapterConfig)
+    } else if (eventType == AUCTION_DEBUG) {
+      console.log('$p: Looking at AUCTION_DEBUG event', { args })
     }
     if (eventToSend !== undefined) {
       this.batch[eventType] ||= []
