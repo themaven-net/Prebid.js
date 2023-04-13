@@ -9,7 +9,6 @@ import { logError, logInfo, logWarn } from '../src/utils.js';
 // Standard Analytics Adapter code
 const AUCTION_END = CONSTANTS.EVENTS.AUCTION_END
 const AUCTION_INIT = CONSTANTS.EVENTS.AUCTION_INIT
-const AUCTION_DEBUG = CONSTANTS.EVENTS.AUCTION_DEBUG
 
 // Internal controls
 const BATCH_MESSAGE_FREQUENCY = 1000; // Send results batched on a 1s delay

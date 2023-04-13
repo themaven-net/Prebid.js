@@ -9,7 +9,8 @@ export const _internal = {
 const ENDPOINT = 'endpoint';
 const BUNDLE = 'bundle';
 
-export const DEFAULT_INCLUDE_EVENTS = Object.values(CONSTANTS.EVENTS);
+export const DEFAULT_INCLUDE_EVENTS = Object.values(CONSTANTS.EVENTS)
+  .filter(ev => ev !== CONSTANTS.EVENTS.AUCTION_DEBUG);
 
 let debounceDelay = 100;
 
