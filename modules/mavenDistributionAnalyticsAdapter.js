@@ -48,6 +48,15 @@ const MAX_BATCH_SIZE_PER_EVENT_TYPE = 32
  * }} AuctionEventArgs
  */
 
+const getAdZone = adUnit = (adUnit, zoneConfig = {}) =>
+  zoneConfig && zoneConfig.index ? Number(zoneConfig.index) : null
+
+const filterDuplicateAdUnits = (adUnits, zoneMap = {}) =>
+  Array.from(new Map(adUnits.map(adUnit => [
+    adUnit.code + getAdZone(adUnit, zoneMap[adUnit.code]),
+    adUnit
+  ])).values())
+
 /**
  * // cpmms, zoneIndexes, and zoneNames all have the same length
  * @typedef {{
@@ -57,7 +66,6 @@ const MAX_BATCH_SIZE_PER_EVENT_TYPE = 32
  *   zoneNames?: string[]
  * }} AuctionInitSummary
  */
-
 /**
  * @param {AuctionEventArgs} args
  * @param {MavenDistributionAdapterConfig} adapterConfig
@@ -71,7 +79,8 @@ export function summarizeAuctionInit(args, adapterConfig) {
   let someZoneIndexNonNull = false
   let someZoneNameNonNull = false
   let allZoneNamesNonNull = true
-  args.adUnits.forEach(adUnit => {
+
+  filterDuplicateAdUnits(args.adUnits, zoneMap).forEach(adUnit => {
     adUnitCodes.push(adUnit.code)
 
     const zoneConfig = zoneMap[adUnit.code] || {}
@@ -120,13 +129,14 @@ export function summarizeAuctionEnd(args, adapterConfig) {
   const cpmmsMap = {}
   /** @type {AuctionEndSummary} */
   const eventToSend = summarizeAuctionInit(args, adapterConfig)
-  args.adUnits.forEach(adUnit => {
+  const adUnits = filterDuplicateAdUnits(args.adUnits, adapterConfig.options.zoneMap)
+  adUnits.forEach(adUnit => {
     cpmmsMap[adUnit.code] = 0
   })
   args.bidsReceived.forEach(bid => {
     cpmmsMap[bid.adUnitCode] = Math.max(cpmmsMap[bid.adUnitCode], Math.round(bid.cpm * 1000 || 0))
   })
-  const cpmms = args.adUnits.map(adUnit => cpmmsMap[adUnit.code])
+  const cpmms = adUnits.map(adUnit => cpmmsMap[adUnit.code])
   eventToSend.cpmms = cpmms
   // args.timestamp is only the _auctionStart in src/auction.js
   // so to get the time for this event we want args.auctionEnd
