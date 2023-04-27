@@ -48,10 +48,10 @@ const MAX_BATCH_SIZE_PER_EVENT_TYPE = 32
  * }} AuctionEventArgs
  */
 
-const getAdZone = adUnit = (adUnit, zoneConfig = {}) =>
+export const getAdZone = (adUnit, zoneConfig = {}) =>
   zoneConfig && zoneConfig.index ? Number(zoneConfig.index) : null
 
-const filterDuplicateAdUnits = (adUnits, zoneMap = {}) =>
+export const filterDuplicateAdUnits = (adUnits, zoneMap = {}) =>
   Array.from(new Map(adUnits.map(adUnit => [
     adUnit.code + getAdZone(adUnit, zoneMap[adUnit.code]),
     adUnit
@@ -80,7 +80,7 @@ export function summarizeAuctionInit(args, adapterConfig) {
   let someZoneNameNonNull = false
   let allZoneNamesNonNull = true
 
-  filterDuplicateAdUnits(args.adUnits, zoneMap).forEach(adUnit => {
+  args.adUnits.forEach(adUnit => {
     adUnitCodes.push(adUnit.code)
 
     const zoneConfig = zoneMap[adUnit.code] || {}
@@ -129,14 +129,13 @@ export function summarizeAuctionEnd(args, adapterConfig) {
   const cpmmsMap = {}
   /** @type {AuctionEndSummary} */
   const eventToSend = summarizeAuctionInit(args, adapterConfig)
-  const adUnits = filterDuplicateAdUnits(args.adUnits, adapterConfig.options.zoneMap)
-  adUnits.forEach(adUnit => {
+  args.adUnits.forEach(adUnit => {
     cpmmsMap[adUnit.code] = 0
   })
   args.bidsReceived.forEach(bid => {
     cpmmsMap[bid.adUnitCode] = Math.max(cpmmsMap[bid.adUnitCode], Math.round(bid.cpm * 1000 || 0))
   })
-  const cpmms = adUnits.map(adUnit => cpmmsMap[adUnit.code])
+  const cpmms = args.adUnits.map(adUnit => cpmmsMap[adUnit.code])
   eventToSend.cpmms = cpmms
   // args.timestamp is only the _auctionStart in src/auction.js
   // so to get the time for this event we want args.auctionEnd
@@ -241,9 +240,21 @@ MavenDistributionAnalyticsAdapterInner.prototype = {
     const {eventType, args} = typeAndArgs
     let eventToSend
     if (eventType === AUCTION_INIT) {
-      eventToSend = summarizeAuctionInit(args, this.adapterConfig)
+      eventToSend = summarizeAuctionInit(
+        {
+          adUnits: filterDuplicateAdUnits(args.adUnits, this.adapterConfig.options.zoneMap),
+          ...args,
+        },
+        this.adapterConfig
+      )
     } else if (eventType === AUCTION_END) {
-      eventToSend = summarizeAuctionEnd(args, this.adapterConfig)
+      eventToSend = summarizeAuctionEnd(
+        {
+          adUnits: filterDuplicateAdUnits(args.adUnits, this.adapterConfig.options.zoneMap),
+          ...args,
+        },
+        this.adapterConfig
+      )
     }
     if (eventToSend !== undefined) {
       this.batch[eventType] ||= []
