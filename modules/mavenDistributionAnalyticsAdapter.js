@@ -48,12 +48,12 @@ const MAX_BATCH_SIZE_PER_EVENT_TYPE = 32
  * }} AuctionEventArgs
  */
 
-export const getAdZone = (adUnit, zoneConfig = {}) =>
+export const getAdIndex = (adUnit, zoneConfig = {}) =>
   zoneConfig && zoneConfig.index ? Number(zoneConfig.index) : null
 
 export const filterDuplicateAdUnits = (adUnits, zoneMap = {}) =>
   Array.from(new Map(adUnits.map(adUnit => [
-    adUnit.code + getAdZone(adUnit, zoneMap[adUnit.code]),
+    adUnit.code + getAdIndex(adUnit, zoneMap[adUnit.code]),
     adUnit
   ])).values())
 

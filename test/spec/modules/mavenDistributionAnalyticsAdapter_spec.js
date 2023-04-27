@@ -1,4 +1,4 @@
-import { filterDuplicateAdUnits, getAdZone, createSendOptionsFromBatch, summarizeAuctionEnd, testables } from '../../../modules/mavenDistributionAnalyticsAdapter.js';
+import { filterDuplicateAdUnits, getAdIndex, createSendOptionsFromBatch, summarizeAuctionEnd, testables } from '../../../modules/mavenDistributionAnalyticsAdapter.js';
 
 var assert = require('assert');
 var adUnits = require('./mavenDistributionAnalyticsAdapter_adUnits.json');
@@ -106,20 +106,20 @@ describe('MavenDistributionAnalyticsAdapter', function () {
       assert.equal(actual.length, 0)
     })
   })
-  describe('getAdZone', function() {
-    it('should return an adzone', function() {
+  describe('getAdIndex', function() {
+    it('should return an adindex', function() {
       var adUnit = adUnits[4];
-      var actual = getAdZone(adUnit, zoneMap[adUnit.code]);
+      var actual = getAdIndex(adUnit, zoneMap[adUnit.code]);
       assert.equal(actual, 0)
     })
     it('should return null for undefined adzones', function() {
       var adUnit = adUnits[4];
-      var actual = getAdZone(adUnit);
+      var actual = getAdIndex(adUnit);
       assert.equal(actual, null)
     })
     it('should cast a string to a number for found indices', function() {
       var adUnit = adUnits[4];
-      var actual = getAdZone(adUnit, {index: '1'});
+      var actual = getAdIndex(adUnit, {index: '1'});
       assert.strictEqual(actual, 1)
     })
   })
