@@ -241,16 +241,16 @@ MavenDistributionAnalyticsAdapterInner.prototype = {
     if (eventType === AUCTION_INIT) {
       eventToSend = summarizeAuctionInit(
         {
-          adUnits: filterDuplicateAdUnits(args.adUnits, this.adapterConfig.options.zoneMap),
           ...args,
+          adUnits: filterDuplicateAdUnits(args.adUnits, this.adapterConfig.options.zoneMap),
         },
         this.adapterConfig
       )
     } else if (eventType === AUCTION_END) {
       eventToSend = summarizeAuctionEnd(
         {
-          adUnits: filterDuplicateAdUnits(args.adUnits, this.adapterConfig.options.zoneMap),
           ...args,
+          adUnits: filterDuplicateAdUnits(args.adUnits, this.adapterConfig.options.zoneMap),
         },
         this.adapterConfig
       )
