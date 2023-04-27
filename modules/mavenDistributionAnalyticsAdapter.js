@@ -79,7 +79,6 @@ export function summarizeAuctionInit(args, adapterConfig) {
   let someZoneIndexNonNull = false
   let someZoneNameNonNull = false
   let allZoneNamesNonNull = true
-
   args.adUnits.forEach(adUnit => {
     adUnitCodes.push(adUnit.code)
 
