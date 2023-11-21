@@ -75,21 +75,22 @@ export function summarizeAuctionInit(args, adapterConfig) {
   const zoneNames = []
   const zoneIndexes = []
   const adUnitCodes = []
-  const zoneMap = adapterConfig.options.zoneMap || {}
   let someZoneIndexNonNull = false
   let someZoneNameNonNull = false
   let allZoneNamesNonNull = true
+
   args.adUnits.forEach(adUnit => {
     adUnitCodes.push(adUnit.code)
 
-    const zoneConfig = zoneMap[adUnit.code] || {}
-    const zoneIndexNonNull = zoneConfig.index != null && isFinite(zoneConfig.index)
-    someZoneIndexNonNull = someZoneIndexNonNull || zoneIndexNonNull
+    const zoneIndex = adUnit.model.index;
+    const zoneName = adUnit.model.zone;
+    const zoneIndexNonNull = zoneIndex != null && isFinite(zoneIndex)
+    const zoneNameNonNull = zoneName != null
 
-    let zoneIndex = zoneIndexNonNull ? +zoneConfig.index : null
-    const zoneNameNonNull = zoneConfig.zone != null
-    zoneIndexes.push(zoneIndex)
-    zoneNames.push(zoneNameNonNull ? zoneConfig.zone : null)
+    zoneIndexes.push(zoneIndex ?? null)
+    zoneNames.push(zoneName ?? null)
+
+    someZoneIndexNonNull = someZoneIndexNonNull || zoneIndexNonNull
     someZoneNameNonNull = someZoneNameNonNull || zoneNameNonNull
     allZoneNamesNonNull = allZoneNamesNonNull && zoneNameNonNull
   })
