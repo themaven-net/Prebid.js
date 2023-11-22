@@ -23,7 +23,6 @@ const MAX_BATCH_SIZE_PER_EVENT_TYPE = 32
  *  provider: typeof PROVIDER_CODE
  *  options: {
  *     sampling?: number
- *     zoneMap?: {[adUnitCode: string]: {index?: number, zone?: string}}
  *  }
  * }} MavenDistributionAdapterConfig
  */
@@ -48,12 +47,12 @@ const MAX_BATCH_SIZE_PER_EVENT_TYPE = 32
  * }} AuctionEventArgs
  */
 
-export const getAdIndex = (adUnit, zoneConfig = {}) =>
-  zoneConfig && zoneConfig.index ? Number(zoneConfig.index) : null
+export const getAdIndex = (adUnit) =>
+  adUnit.model ? Number(adUnit.model.index) : null
 
-export const filterDuplicateAdUnits = (adUnits, zoneMap = {}) =>
+export const filterDuplicateAdUnits = (adUnits) =>
   Array.from(new Map(adUnits.map(adUnit => [
-    adUnit.code + getAdIndex(adUnit, zoneMap[adUnit.code]),
+    adUnit.code + getAdIndex(adUnit),
     adUnit
   ])).values())
 
@@ -82,13 +81,13 @@ export function summarizeAuctionInit(args, adapterConfig) {
   args.adUnits.forEach(adUnit => {
     adUnitCodes.push(adUnit.code)
 
-    const zoneIndex = adUnit.model.index;
-    const zoneName = adUnit.model.zone;
-    const zoneIndexNonNull = zoneIndex != null && isFinite(zoneIndex)
+    const zoneIndex = getAdIndex(adUnit);
+    const zoneName = adUnit.model?.zone ?? null
+    const zoneIndexNonNull = zoneIndex != null
     const zoneNameNonNull = zoneName != null
 
-    zoneIndexes.push(zoneIndex ?? null)
-    zoneNames.push(zoneName ?? null)
+    zoneIndexes.push(zoneIndex)
+    zoneNames.push(zoneName)
 
     someZoneIndexNonNull = someZoneIndexNonNull || zoneIndexNonNull
     someZoneNameNonNull = someZoneNameNonNull || zoneNameNonNull
@@ -243,7 +242,7 @@ MavenDistributionAnalyticsAdapterInner.prototype = {
       eventToSend = summarizeAuctionInit(
         {
           ...args,
-          adUnits: filterDuplicateAdUnits(args.adUnits, this.adapterConfig.options.zoneMap),
+          adUnits: filterDuplicateAdUnits(args.adUnits),
         },
         this.adapterConfig
       )
@@ -251,7 +250,7 @@ MavenDistributionAnalyticsAdapterInner.prototype = {
       eventToSend = summarizeAuctionEnd(
         {
           ...args,
-          adUnits: filterDuplicateAdUnits(args.adUnits, this.adapterConfig.options.zoneMap),
+          adUnits: filterDuplicateAdUnits(args.adUnits),
         },
         this.adapterConfig
       )
