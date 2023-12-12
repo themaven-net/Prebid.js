@@ -97,13 +97,13 @@ export function summarizeAuctionInit(args, adapterConfig) {
       adUnit.mediaTypes.video?.durationRangeSec.forEach((value, podIndex) => {
         adUnitCodes.push(adUnit.code)
         zoneIndexes.push(zoneIndex)
-        zoneNames.push(zoneNameNonNull ? zoneName : null)
+        zoneNames.push(zoneName)
         podPos.push(podIndex + 1)
       })
     } else {
       adUnitCodes.push(adUnit.code)
       zoneIndexes.push(zoneIndex)
-      zoneNames.push(zoneNameNonNull ? zoneName : null)
+      zoneNames.push(zoneName)
       podPos.push(0)
     }
   })
