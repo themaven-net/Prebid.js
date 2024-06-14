@@ -48,6 +48,14 @@ const MAX_BATCH_SIZE_PER_EVENT_TYPE = 32
  * }} AuctionEventArgs
  */
 
+export const getFloor = (fbr) => {
+  let floor = fbr?.getFloor?.()?.floor ?? null;
+  if (floor) {
+    floor = Math.round((floor || 0) * 1000);
+  }
+  return floor
+}
+
 export const getAdIndex = (adUnit) =>
   adUnit.model ? Number(adUnit.model.index) : null
 
@@ -137,11 +145,7 @@ export function summarizeAuctionInit(args, adapterConfig) {
     flattenedBidRequests.forEach(fbr => {
       if (fbr.adUnitCode === adUnit.code) {
         bidders.push(fbr.bidder)
-        let floor = fbr?.getFloor?.()?.floor ?? null;
-        if (floor) {
-          floor = Math.round((floor || 0) * 1000);
-        }
-        floors.push(floor)
+        floors.push(getFloor(fbr))
       }
     })
     bidderss.push(bidders)
@@ -267,11 +271,7 @@ export function summarizeAuctionEnd(args, adapterConfig) {
             break
           }
         }
-        let floor = fbr?.getFloor?.()?.floor ?? null;
-        if (floor) {
-          floor = Math.round((floor || 0) * 1000);
-        }
-        floors.push(floor)
+        floors.push(getFloor(fbr))
         bidStatuss.push(bidStatus)
         bidAmounts.push(bidAmount)
         bidResponseTimes.push(bidResponseTime)
