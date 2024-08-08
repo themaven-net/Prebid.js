@@ -166,13 +166,13 @@ const getBidStatusAmtsAndResponseTime = (statusKey, bidRequest, args) => {
       bidAmount: Math.round((bid.cpm || 0) * 1000),
       bidResponseTime: bid.timeToRespond ?? null,
     }),
-    noBids: (bid) => ({
+    noBids: () => ({
       bidStatus: 'nobid',
       bidAmount: 0,
       bidResponseTime: null,
     }),
     bidsReceived: (bid) => ({
-      bidStatus: ((bid.timeToRespond >= args.timeout) ? 'timeout:' : '') + 'bid',
+      bidStatus: (((bid.timeToRespond ?? 0) >= args.timeout) ? 'timeout:' : '') + 'bid',
       bidAmount: Math.round((bid.cpm || 0) * 1000),
       bidResponseTime: bid.timeToRespond,
     })
