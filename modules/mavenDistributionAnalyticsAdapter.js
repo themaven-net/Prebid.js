@@ -162,7 +162,7 @@ const getBidStatusAmtsAndResponseTime = (statusKey, bidRequest, args) => {
   // values for each bid condition
   const BID_STATUS_MAP = {
     bidsRejected: (bid) => ({
-      bidStatus: `error: ${bid.rejectionReason || 'generic'}`,
+      bidStatus: (((bid.timeToRespond ?? 0) >= args.timeout) ? 'timeout:' : '') + `error: ${bid.rejectionReason || 'generic'}`,
       bidAmount: Math.round((bid.cpm || 0) * 1000),
       bidResponseTime: bid.timeToRespond ?? null,
     }),
@@ -172,7 +172,7 @@ const getBidStatusAmtsAndResponseTime = (statusKey, bidRequest, args) => {
       bidResponseTime: null,
     }),
     bidsReceived: (bid) => ({
-      bidStatus: (bid.timeToRespond < args.timeout) ? 'bid' : 'delay',
+      bidStatus: ((bid.timeToRespond >= args.timeout) ? 'timeout:' : '') + 'bid',
       bidAmount: Math.round((bid.cpm || 0) * 1000),
       bidResponseTime: bid.timeToRespond,
     })
@@ -261,7 +261,7 @@ export function summarizeAuctionEnd(args, adapterConfig) {
         // or less than timeout and assign it either a timeout bid or a valid valid
         // The bidsReceived array has both timeout bids and the valid bids
         const statusKeys = ['bidsRejected', 'noBids', 'bidsReceived']
-        let bidStatus = 'timeout', bidAmount = 0, bidResponseTime = args.timeout;
+        let bidStatus = 'timeout:missing', bidAmount = 0, bidResponseTime = args.timeout;
         for (const statusKey of statusKeys) {
           const data = getBidStatusAmtsAndResponseTime(statusKey, fbr, args)
           if (data) {
